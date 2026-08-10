@@ -1,42 +1,50 @@
-# parameters for tree
-starting_techs <- 5
-max_tier <- 8
-tree_growth_rate <- 2
-num_techs_per_tier <- function(tier) { 
+### editable  parameters for tree
+starting_techs <- 5 # number of techs in tier 1
+max_tier <- 8 # number to tiers in tree
+tree_growth_rate <- 2 # rate at with tiers get wider
+p_extra_dependency <- 0.0005 # probability a given extra dependency is realized
+max_tier_gap_for_dependencies <- 99 # how many tiers extra dependencies can cross
+p_keystone_tech <- 0.0 # probability a tech is a keystone tech
+keystone_multiplier <- 200 # how much more likely keystone techs are to have extra dependencies
+
+
+
+
+### non editable helper values
+# function to generate number of techs in each tier
+num_techs_per_tier <- function(tier) {
   return(round((tier + (starting_techs)^(1/tree_growth_rate) - 1)^tree_growth_rate))
 }
+# total number of techs in tree
 n_techs <- sum(num_techs_per_tier(c(1:max_tier)))
-p_extra_dependency <- 0.02/n_techs
-p_keystone_tech <- 0.0
+# ids of keystone techs
 keystone_techs <- sample(c(1:n_techs), round(p_keystone_tech * n_techs))
-keystone_multiplier <- 200
-max_tier_gap_for_dependencies <- 5
 
+
+### construct the tree
 # initialize data frame
 techs <- data.frame(
-  id   = integer(),
-  tier = integer(),
-  xpos = numeric(),
-  ypos = numeric()
+  id   = integer(), # unique ID for each tech
+  tier = integer(), # what tier its in
+  xpos = numeric(), # xcor for plotting
+  ypos = numeric()  # ycor for plotting
 )
 
 # create techs
 for (t in 1:max_tier) {
   n_techs_tier <- num_techs_per_tier(t)
-  
   ids <- c((nrow(techs)+1):(nrow(techs)+n_techs_tier))
-  
   new_rows <- data.frame(
     id = ids,
     tier = rep(t, n_techs_tier),
     xpos = ids - mean(ids),
     ypos = rep(t, n_techs_tier)
   )
-
   techs <- rbind(techs, new_rows)
 }
 
 # initialize dependencies:
+# "dependencies" is a n-by-n matrix that scores the relationship between every pair of techs
 dependencies <- matrix(0, nrow=n_techs, ncol=n_techs)
 
 # dependency code:
@@ -49,6 +57,7 @@ dependencies <- matrix(0, nrow=n_techs, ncol=n_techs)
 # -3 = indirect from-to
 
 # add basic dependencies
+# each tech has one basic dependecy from a random chosen tech in the prior tier
 for (i in 1:n_techs) {
   tech <- techs[i,]
   if (tech$tier > 1) {
@@ -60,6 +69,7 @@ for (i in 1:n_techs) {
 }
 
 # identify indirect dependencies
+# e.g. A -> B and B -> C, implies A -> C
 for (to in 1:n_techs) {
   if (techs$tier[techs$id == to] > 1) {
     for (from in 1:(i-1)) {
@@ -92,18 +102,17 @@ for (i in 2:max_tier) {  # go through all tiers, starting with tier 3
   techs$xpos[match(ordered_ids, techs$id)] <- seq_along(ordered_ids) - mean(seq_along(ordered_ids))  # insert into db
 }
 
-old_ds <- dependencies
-
-# add some arbitrary dependencies
+# add some extra dependencies
+# these can occur between any possible techs
+# as long as they don't already have a dependency of any kind
+# and as long as they are not too many tiers apart
 pairs <- expand.grid(
   from = 1:n_techs,
   to   = 1:n_techs
 )
 pairs$parent_tier <- techs$tier[match(pairs$from, techs$id)]
 pairs$child_tier  <- techs$tier[match(pairs$to, techs$id)]
-
 pairs$tier_delta <- abs(pairs$parent_tier - pairs$child_tier)
-
 pairs <- pairs[sample(nrow(pairs)), ]
 
 for (i in 1:nrow(pairs)) {
@@ -112,20 +121,11 @@ for (i in 1:nrow(pairs)) {
   child <- pair$to
   tier_delta <- pair$tier_delta
   
-  # print(paste0("*** Considering: ", parent, " -> ", child))
-  # if (parent == child) {
-  #   print(paste0("Cannot add it as they are the same"))
-  # }
-  # if (dependencies[parent, child] != 0) {
-  #   print(paste0("Cannot add it as they have a relationship: ", dependencies[parent, child]))
-  # }
-  
   
   if ((parent != child) & (dependencies[parent, child] == 0) & (tier_delta <= max_tier_gap_for_dependencies)) {
     p_link <- p_extra_dependency
     if (parent %in% keystone_techs) { p_link <- p_link * keystone_multiplier }
     if (runif(1,0,1) < p_link) {
-      # print(paste0("Adding dependency from ", parent, " to ", child, ". ", dependencies[parent, child]))
       dependencies[parent, child] <- 2
       dependencies[child, parent] <- -2
       
@@ -161,7 +161,6 @@ for (i in 1:nrow(pairs)) {
 # calculate total number of dependencies
 techs$direct_dependencies <- rowSums((dependencies > 0) * (dependencies < 3))
 techs$all_dependencies <- rowSums(dependencies > 0)
-
 
 # add some jitter
 techs$xpos <- techs$xpos + rnorm(n_techs, 0, 0.1)
