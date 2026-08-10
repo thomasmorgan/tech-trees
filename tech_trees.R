@@ -16,9 +16,10 @@ techs <- data.frame(
 )
 
 # create techs
-for (t in 2:max_tier) {
+for (t in 1:max_tier) {
   n_techs_tier <- num_techs_per_tier(t)
-  ids <- c((max(techs$id) + 1):(max(techs$id) + n_techs_tier))
+  
+  ids <- c((nrow(techs)+1):(nrow(techs)+n_techs_tier))
   
   new_rows <- data.frame(
     id = ids,
