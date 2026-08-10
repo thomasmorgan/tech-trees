@@ -6,6 +6,7 @@ p_extra_dependency <- 0.02/n_techs
 p_keystone_tech <- 0.0
 keystone_techs <- sample(c(1:n_techs), round(p_keystone_tech * n_techs))
 keystone_multiplier <- 200
+max_tier_gap_for_dependencies <- 5
 
 # initialize data frame
 techs <- data.frame(
@@ -94,12 +95,18 @@ pairs <- expand.grid(
   from = 1:n_techs,
   to   = 1:n_techs
 )
+pairs$parent_tier <- techs$tier[match(pairs$from, techs$id)]
+pairs$child_tier  <- techs$tier[match(pairs$to, techs$id)]
+
+pairs$tier_delta <- abs(pairs$parent_tier - pairs$child_tier)
+
 pairs <- pairs[sample(nrow(pairs)), ]
 
 for (i in 1:nrow(pairs)) {
   pair <- pairs[i,]
   parent <- pair$from
   child <- pair$to
+  tier_delta <- pair$tier_delta
   
   # print(paste0("*** Considering: ", parent, " -> ", child))
   # if (parent == child) {
@@ -110,7 +117,7 @@ for (i in 1:nrow(pairs)) {
   # }
   
   
-  if ((parent != child) & (dependencies[parent, child] == 0)) {
+  if ((parent != child) & (dependencies[parent, child] == 0) & (tier_delta <= max_tier_gap_for_dependencies)) {
     p_link <- p_extra_dependency
     if (parent %in% keystone_techs) { p_link <- p_link * keystone_multiplier }
     if (runif(1,0,1) < p_link) {
