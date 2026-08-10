@@ -10,14 +10,13 @@ keystone_multiplier <- 200 # how much more likely keystone techs are to have ext
 
 
 
-### non editable helper values
+### construct the tree
 # function to generate number of techs in each tier
 num_techs_per_tier <- function(tier) {
   if (tree_growth_rate < 0.01) { return(starting_techs) }
   return(round((tier + (starting_techs)^(1/tree_growth_rate) - 1)^tree_growth_rate))
 }
 
-### construct the tree
 # initialize data frame
 techs <- data.frame(
   id   = integer(), # unique ID for each tech
