@@ -74,7 +74,7 @@ for (to in 1:n_techs) {
 }
 
 # horizontally reorder techs to make tree nicer looking
-for (i in 3:max_tier) {  # go through all tiers, starting with tier 3
+for (i in 2:max_tier) {  # go through all tiers, starting with tier 3
   this_tier_ids <- techs[techs$tier == i,]$id  # first get the ids of the techs in this tier
   parents <- parent_xpos <- vector()
   for (t in this_tier_ids) {
