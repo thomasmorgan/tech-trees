@@ -16,11 +16,6 @@ num_techs_per_tier <- function(tier) {
   if (tree_growth_rate < 0.01) { return(starting_techs) }
   return(round((tier + (starting_techs)^(1/tree_growth_rate) - 1)^tree_growth_rate))
 }
-# total number of techs in tree
-n_techs <- sum(num_techs_per_tier(c(1:max_tier)))
-# ids of keystone techs
-keystone_techs <- sample(c(1:n_techs), round(p_keystone_tech * n_techs))
-
 
 ### construct the tree
 # initialize data frame
@@ -43,6 +38,11 @@ for (t in 1:max_tier) {
   )
   techs <- rbind(techs, new_rows)
 }
+
+# total number of techs in tree
+n_techs <- nrow(techs)
+# ids of keystone techs
+keystone_techs <- sample(c(1:n_techs), round(p_keystone_tech * n_techs))
 
 # initialize dependencies:
 # "dependencies" is a n-by-n matrix that scores the relationship between every pair of techs
