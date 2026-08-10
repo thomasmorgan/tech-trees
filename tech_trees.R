@@ -1,6 +1,6 @@
 # parameters for tree
-max_tier <- 10
-num_techs_per_tier <- function(tier) { return(round((tier/1.5)^1.5)) }
+max_tier <- 7
+num_techs_per_tier <- function(tier) { return(round((tier + 2)^1.5)) }
 n_techs <- sum(num_techs_per_tier(c(1:max_tier)))
 p_extra_dependency <- 0.02/n_techs
 p_keystone_tech <- 0.02
