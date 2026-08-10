@@ -123,7 +123,11 @@ for (i in 1:nrow(pairs)) {
   tier_delta <- pair$tier_delta
   
   
-  if ((parent != child) & (dependencies[parent, child] == 0) & (tier_delta <= max_tier_gap_for_dependencies)) {
+  if ((parent != child) &
+      (dependencies[parent, child] == 0) &
+      (tier_delta <= max_tier_gap_for_dependencies) &
+      (pair$parent_tier > 1) &
+      (pair$child_tier > 1)) {
     p_link <- p_extra_dependency
     if (parent %in% keystone_techs) { p_link <- p_link * keystone_multiplier }
     if (runif(1,0,1) < p_link) {
