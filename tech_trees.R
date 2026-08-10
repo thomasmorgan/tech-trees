@@ -9,10 +9,10 @@ keystone_multiplier <- 200
 
 # initialize data frame
 techs <- data.frame(
-  id = 1,
-  tier = 1,
-  xpos = 0,
-  ypos = 1
+  id   = integer(),
+  tier = integer(),
+  xpos = numeric(),
+  ypos = numeric()
 )
 
 # create techs
