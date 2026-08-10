@@ -54,16 +54,18 @@ for (i in 1:n_techs) {
 }
 
 # identify indirect dependencies
-for (to in 2:n_techs) {
-  for (from in 1:(i-1)) {
-    if (dependencies[from, to] > 0) {
-      earlier_techs <- c(1:n_techs)[dependencies[,from] > 0]
-      for (et in earlier_techs) {
-        if (dependencies[et, to] == 0) {
-          dependencies[et,to] <- 3
-        }
-        if (dependencies[to, et] == 0) {
-          dependencies[to,et] <- -3
+for (to in 1:n_techs) {
+  if (techs$tier[techs$id == to] > 1) {
+    for (from in 1:(i-1)) {
+      if (dependencies[from, to] > 0) {
+        earlier_techs <- c(1:n_techs)[dependencies[,from] > 0]
+        for (et in earlier_techs) {
+          if (dependencies[et, to] == 0) {
+            dependencies[et,to] <- 3
+          }
+          if (dependencies[to, et] == 0) {
+            dependencies[to,et] <- -3
+          }
         }
       }
     }
