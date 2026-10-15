@@ -110,7 +110,7 @@ create_tech_tree <- function() {
     }
     ord <- order(parent_xpos, this_tier_ids)  # get order of parents' xposs, breaking by offspring id
     ordered_ids <- this_tier_ids[ord]   # order the ids according to this
-    techs$xpos[match(ordered_ids, techs$id)] <- seq_along(ordered_ids) - mean(seq_along(ordered_ids))  # insert into db
+    techs$xpos[match(ordered_ids, techs$id)] <<- seq_along(ordered_ids) - mean(seq_along(ordered_ids))  # insert into db
   }
   
   # add some extra dependencies
