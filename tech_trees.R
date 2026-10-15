@@ -186,8 +186,12 @@ plot_tech_tree <- function() {
   hist(techs$all_dependencies/n_techs)
   
   #dot_sizes <- (((techs$all_dependencies/n_techs)^0.5)) * 50 / max_tier
-  dot_sizes <- (techs$all_dependencies/n_techs)^0.5*50 / max_tier
-  plot(techs$ypos~techs$xpos, bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes)
+  #dot_sizes <- (techs$all_dependencies/n_techs)^0.5*50 / max_tier
+  dot_sizes <- techs$payoff
+  pal <- hcl.colors(256, "viridis")
+  dot_cols <- pal[pmin(1 + round(techs$payoff/6 * 255), 256)]
+  
+  plot(techs$ypos~techs$xpos, bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes, col=dot_cols)
   keystone_techs <- techs$id[techs$keystone == 1]
   points(techs$ypos[keystone_techs]~techs$xpos[keystone_techs], pch=16, cex=dot_sizes[keystone_techs], col="purple")
   if (max_tier < 8) {
