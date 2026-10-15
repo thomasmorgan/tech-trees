@@ -22,7 +22,8 @@ create_techs <- function() {
   techs <- data.frame(
     id   = integer(), # unique ID for each tech
     tier = integer(), # what tier its in
-    keystone = integer(),
+    payoff = numeric(), # what's the payoff of this tech
+    keystone = integer(), # is it a keystone tech
     xpos = numeric(), # xcor for plotting
     ypos = numeric()  # ycor for plotting
   )
@@ -34,6 +35,7 @@ create_techs <- function() {
     new_rows <- data.frame(
       id = ids,
       tier = rep(t, n_techs_tier),
+      payoff = rexp(n_techs_tier, 1),
       keystone = round(runif(n_techs_tier, 0, 1) < p_keystone_tech)*1,
       xpos = ids - mean(ids),
       ypos = rep(t, n_techs_tier)
