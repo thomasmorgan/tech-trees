@@ -80,13 +80,63 @@ for (i in 1:generations) {
   }
   
 }
-sampled_techs
-plot(n_known_techs, ylim=c(0, max(n_known_techs)))
-abline(0, max(n_known_techs)/generations)
+
+par(mfrow=c(2, 3))
+
+# panel 1
+plot_tech_tree()
+
+# panel 2
+incoming <- techs$direct_incoming_dependencies
+outgoing <- techs$direct_outgoing_dependencies
+
+breaks <- seq(min(c(incoming, outgoing)) - 0.5,
+              max(c(incoming, outgoing)) + 0.5, by = 1)
+
+h_in <- hist(incoming, breaks = breaks, plot = FALSE)
+h_out <- hist(outgoing, breaks = breaks, plot = FALSE)
+
+plot(h_in, col = adjustcolor("maroon", alpha.f = 0.5),
+     main = "Number of dependencies", xlab = "Dependencies",
+     ylim = c(0, max(h_in$counts, h_out$counts)))
+plot(h_out, col = adjustcolor("cornflowerblue", alpha.f = 0.5),
+     add = TRUE)
+
+legend("topright", legend = c("Incoming", "Outgoing"),
+       fill = adjustcolor(c("maroon", "cornflowerblue"), alpha.f = 0.5))
+
+
+# panel 3
+incoming <- techs$all_incoming_dependencies/nrow(techs)
+outgoing <- techs$all_outgoing_dependencies/nrow(techs)
+
+breaks <- seq(0,
+              1, by = 0.05)
+
+h_in <- hist(incoming, breaks = breaks, plot = FALSE)
+h_out <- hist(outgoing, breaks = breaks, plot = FALSE)
+
+plot(h_in, col = adjustcolor("maroon", alpha.f = 0.5),
+     main = "Proportion of tree indirectly depending", xlab = "Proportion",
+     ylim = c(0, max(h_in$counts, h_out$counts)))
+plot(h_out, col = adjustcolor("cornflowerblue", alpha.f = 0.5),
+     add = TRUE)
+
+legend("topright", legend = c("Incoming", "Outgoing"),
+       fill = adjustcolor(c("maroon", "cornflowerblue"), alpha.f = 0.5))
+
+
+# plot 4
+plot(n_known_techs, ylim=c(0, max(n_known_techs)), type="l")
+
+# plot 5
 scaled_payoff <- payoff / max(payoff) * max(n_known_techs)
-smoothed_scaled_payoff <- stats::filter(scaled_payoff, rep(1 / 50, 50), sides = 1)
+smoothed_payoff <- stats::filter(payoff, rep(1 / 100, 100), sides = 1)
+plot(smoothed_payoff)
+lines(expected_payoff, col="maroon")
+
+# plot 6
 total_payoff <- cumsum(payoff)
-scaled_total_payoff <- total_payoff/max(total_payoff) * max(n_known_techs)
-lines(smoothed_scaled_payoff, col="cornflowerblue")
-lines(scaled_total_payoff, col="firebrick")
+plot(total_payoff, type="l")
+abline(0,sum(payoff)/length(payoff), lty=2)
 
