@@ -1,7 +1,9 @@
 source("tech_trees.R")
 
+# make the tree
 techs <- create_techs()
 dependencies <- create_tech_tree()
+plot_tech_tree()
 
 generations <- 100  # how many goes
 p_innovate <- 0.1  # probaiblity a tech that can be innovated, is innovated
