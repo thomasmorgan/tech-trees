@@ -23,7 +23,8 @@ expected_payoff <- vector()
 for (i in 1:generations) {
   ### EXPLOIT ###
   known_payoffs <- techs$payoff[known_techs]
-  sampled_tech <- sample(known_techs, 1, prob=known_payoffs^greediness)
+  known_probs <- known_payoffs^greediness/(sum(known_payoffs^greediness))
+  sampled_tech <- sample(known_techs, 1, prob=known_probs)
   payoff <- c(payoff, techs[sampled_tech,]$payoff)
   sampled_techs <- c(sampled_techs, sampled_tech)
   
