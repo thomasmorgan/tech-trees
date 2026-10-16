@@ -17,6 +17,7 @@ known_techs <- tier_1_techs  # vector of known techs by ID
 sampled_techs <- vector()  # vector for which tech is exploited on each step
 n_known_techs <- vector()
 payoff <- vector()
+expected_payoff <- vector()
 
 # innovation loop
 for (i in 1:generations) {
@@ -25,6 +26,8 @@ for (i in 1:generations) {
   sampled_tech <- sample(known_techs, 1, prob=known_payoffs^greediness)
   payoff <- c(payoff, techs[sampled_tech,]$payoff)
   sampled_techs <- c(sampled_techs, sampled_tech)
+  
+  expected_payoff <- c(expected_payoff, sum(known_payoffs*known_probs))
   
   ### INNOVATE ###
   
