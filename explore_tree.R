@@ -9,8 +9,11 @@ generations <- 100  # how many goes
 p_innovate <- 0.1  # probaiblity a tech that can be innovated, is innovated
 can_innovate_from_path <- TRUE # whether innovations can be made anywhere along the path leading to a tech
 greediness <- 3  # how aggressively do you exploit high paying techs?
+p_forget <- 0.001 # probability a tech is forgotten
+can_forget_used_techs <- FALSE # can you forget a tech exploited on that turn
 
-known_techs <- techs$id[techs$tier == 1]  # vector of known techs by ID
+tier_1_techs <- techs$id[techs$tier == 1]
+known_techs <- tier_1_techs  # vector of known techs by ID
 sampled_techs <- vector()  # vector for which tech is exploited on each step
 n_known_techs <- vector()
 payoff <- vector()
@@ -51,6 +54,26 @@ for (i in 1:generations) {
   sampled_techs <- c(sampled_techs, sampled_tech)
   n_known_techs <- c(n_known_techs, length(known_techs))
   payoff <- c(payoff, techs[sampled_tech,]$payoff)
+  
+  ### FORGET ###
+  
+  # which techs might be forgotten
+  if (can_forget_used_techs) {
+    forgettable_techs <- known_techs
+  } else {
+    forgettable_techs <- known_techs[!known_techs %in% points_of_innovation]
+  }
+  # cannot forget tier 1 techs!
+  forgettable_techs <- forgettable_techs[!forgettable_techs %in% tier_1_techs]
+  
+  # forget them with probability
+  for (t in forgettable_techs) {
+    if (runif(1, 0, 1) < p_forget) {
+      techs_to_forget <- c(t, techs$id[dependencies[t,] > 0])
+      known_techs <- known_techs[!known_techs %in% techs_to_forget]
+    }
+  }
+  
 }
 sampled_techs
 plot(n_known_techs, ylim=c(0, max(n_known_techs)))
