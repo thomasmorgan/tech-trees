@@ -8,6 +8,7 @@ plot_tech_tree()
 generations <- 100  # how many goes
 p_innovate <- 0.1  # probaiblity a tech that can be innovated, is innovated
 can_innovate_from_path <- TRUE # whether innovations can be made anywhere along the path leading to a tech
+greediness <- 3  # how aggressively do you exploit high paying techs?
 
 known_techs <- techs$id[techs$tier == 1]  # vector of known techs by ID
 sampled_techs <- vector()  # vector for which tech is exploited on each step
@@ -16,7 +17,8 @@ sampled_techs <- vector()  # vector for which tech is exploited on each step
 for (i in 1:generations) {
   # pick a tech to exploit
   known_payoffs <- techs$payoff[known_techs]
-  sampled_tech <- sample(known_techs, 1, prob=known_payoffs)
+  sampled_tech <- sample(known_techs, 1, prob=known_payoffs^greediness)
+  
   # which nodes might you innovate from
   if (can_innovate_from_path) {
     # the exploited tech and all other techs it depends on
