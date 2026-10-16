@@ -20,9 +20,13 @@ payoff <- vector()
 
 # innovation loop
 for (i in 1:generations) {
-  # pick a tech to exploit
+  ### EXPLOIT ###
   known_payoffs <- techs$payoff[known_techs]
   sampled_tech <- sample(known_techs, 1, prob=known_payoffs^greediness)
+  payoff <- c(payoff, techs[sampled_tech,]$payoff)
+  sampled_techs <- c(sampled_techs, sampled_tech)
+  
+  ### INNOVATE ###
   
   # which nodes might you innovate from
   if (can_innovate_from_path) {
@@ -41,19 +45,17 @@ for (i in 1:generations) {
     # remove those we already know
     unknown_connected_techs <- connected_techs[!connected_techs %in% known_techs]
     
-    # for each of those, they can be innovated if...
+    # for each of those, they can be innovated if all dependencies are known, and with a bit of luck
     for (t in unknown_connected_techs) {
       required_techs <- techs$id[dependencies[t,] < 0]
-      if (all(required_techs %in% known_techs)) {  # all dependencies must be known
+      if (all(required_techs %in% known_techs)) {
         if (runif(1, 0, 1) < p_innovate) {
           known_techs <- c(known_techs, t)
         }
       }
     }
   }
-  sampled_techs <- c(sampled_techs, sampled_tech)
   n_known_techs <- c(n_known_techs, length(known_techs))
-  payoff <- c(payoff, techs[sampled_tech,]$payoff)
   
   ### FORGET ###
   
