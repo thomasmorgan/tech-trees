@@ -12,6 +12,8 @@ greediness <- 3  # how aggressively do you exploit high paying techs?
 
 known_techs <- techs$id[techs$tier == 1]  # vector of known techs by ID
 sampled_techs <- vector()  # vector for which tech is exploited on each step
+n_known_techs <- vector()
+payoff <- vector()
 
 # innovation loop
 for (i in 1:generations) {
@@ -47,4 +49,16 @@ for (i in 1:generations) {
     }
   }
   sampled_techs <- c(sampled_techs, sampled_tech)
+  n_known_techs <- c(n_known_techs, length(known_techs))
+  payoff <- c(payoff, techs[sampled_tech,]$payoff)
 }
+sampled_techs
+plot(n_known_techs, ylim=c(0, max(n_known_techs)))
+abline(0, max(n_known_techs)/generations)
+scaled_payoff <- payoff / max(payoff) * max(n_known_techs)
+smoothed_scaled_payoff <- stats::filter(scaled_payoff, rep(1 / 50, 50), sides = 1)
+total_payoff <- cumsum(payoff)
+scaled_total_payoff <- total_payoff/max(total_payoff) * max(n_known_techs)
+lines(smoothed_scaled_payoff, col="cornflowerblue")
+lines(scaled_total_payoff, col="firebrick")
+
