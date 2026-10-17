@@ -162,16 +162,16 @@ create_tech_tree <- function() {
   }
   
   # calculate total number of dependencies
-  techs$direct_dependencies <<- rowSums((dependencies > 0) * (dependencies < 3))
-  techs$all_dependencies <<- rowSums(dependencies > 0)
+  techs$direct_outgoing_dependencies <<- rowSums((dependencies > 0) * (dependencies < 3))
+  techs$direct_incoming_dependencies <<- rowSums((dependencies < 0) * (dependencies > -3))
+  techs$all_outgoing_dependencies <<- rowSums(dependencies > 0)
+  techs$all_incoming_dependencies <<- rowSums(dependencies < 0)
 
   return(dependencies)
 }
 
 plot_tech_tree <- function() {
   # plot tree
-  hist(techs$direct_dependencies)
-  hist(techs$all_dependencies/n_techs)
   
   #dot_sizes <- (((techs$all_dependencies/n_techs)^0.5)) * 50 / max_tier
   #dot_sizes <- (techs$all_dependencies/n_techs)^0.5*50 / max_tier
@@ -192,7 +192,7 @@ plot_tech_tree <- function() {
       if (dependencies[i,j] == 1) {
         from <- techs[techs$id == i,]
         to <- techs[techs$id == j,]
-        lines(c(from$ypos, to$ypos)~c(from$xpos, to$xpos), lwd=(to$all_dependencies/n_techs * 5 + 0.5))
+        lines(c(from$ypos, to$ypos)~c(from$xpos, to$xpos), lwd=(to$all_dependencies/n_techs * 10 + 0.5))
       }
       if (dependencies[i,j] == 2) {
         from <- techs[techs$id == i,]
