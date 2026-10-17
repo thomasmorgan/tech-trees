@@ -209,9 +209,3 @@ plot_tech_tree <- function() {
   }
 }
 
-techs <- create_techs()
-dependencies <- create_tech_tree()
-plot_tech_tree()
-
-
-
