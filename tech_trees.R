@@ -1,16 +1,4 @@
-### editable  parameters for tree
-starting_techs <- 5 # number of techs in tier 1
-max_tier <- 8 # number to tiers in tree
-tree_growth_rate <- 2 # rate at with tiers get wider
-p_extra_dependency <- 0.0005 # probability a given extra dependency is realized
-max_tier_gap_for_dependencies <- 99 # how many tiers extra dependencies can cross
-p_keystone_tech <- 0.0 # probability a tech is a keystone tech
-keystone_multiplier <- 200 # how much more likely keystone techs are to have extra dependencies
 
-
-
-
-### construct the tree
 # function to generate number of techs in each tier
 num_techs_per_tier <- function(tier) {
   if (tree_growth_rate < 0.01) { return(starting_techs) }

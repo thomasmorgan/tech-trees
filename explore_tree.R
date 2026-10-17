@@ -1,13 +1,27 @@
 source("tech_trees.R")
 
-generations <- 100  # how many goes
-p_innovate <- 0.1  # probaiblity a tech that can be innovated, is innovated
+### EDITABLE PARAMETERS ###
+
+starting_techs <- 5 # number of techs in tier 1
+max_tier <- 8 # number to tiers in tree
+tree_growth_rate <- 2 # rate at with tiers get wider
+p_extra_dependency <- 0.001 # probability a given extra dependency is realized
+max_tier_gap_for_dependencies <- 99 # how many tiers extra dependencies can cross
+p_keystone_tech <- 0.00 # probability a tech is a keystone tech
+keystone_multiplier <- 10 # how much more likely keystone techs are to have extra dependencies
+
+generations <- 20000  # how many goes
+p_innovate <- 0.1  # probability a tech that can be innovated, is innovated
 can_innovate_from_path <- TRUE # whether innovations can be made anywhere along the path leading to a tech
-greediness <- 3  # how aggressively do you exploit high paying techs?
-p_forget <- 0.001 # probability a tech is forgotten
+greediness <- 1  # how aggressively do you exploit high paying techs?
+p_forget <- 0.005 # probability a tech is forgotten
 can_forget_used_techs <- FALSE # can you forget a tech exploited on that turn
 can_forget_stem_techs <- FALSE # can you forget a tech than another known tehc depends on
 
+
+### FUNCTIONS ###
+
+# a single mind explores the tree
 run_simulation <- function() {
 
   tier_1_techs <- techs$id[techs$tier == 1]
