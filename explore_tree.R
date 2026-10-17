@@ -11,6 +11,7 @@ can_innovate_from_path <- TRUE # whether innovations can be made anywhere along 
 greediness <- 3  # how aggressively do you exploit high paying techs?
 p_forget <- 0.001 # probability a tech is forgotten
 can_forget_used_techs <- FALSE # can you forget a tech exploited on that turn
+can_forget_stem_techs <- FALSE # can you forget a tech than another known tehc depends on
 
 run_simulation <- function() {
 
