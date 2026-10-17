@@ -1,9 +1,5 @@
 source("tech_trees.R")
 
-# make the tree
-techs <- create_techs()
-dependencies <- create_tech_tree()
-
 generations <- 100  # how many goes
 p_innovate <- 0.1  # probaiblity a tech that can be innovated, is innovated
 can_innovate_from_path <- TRUE # whether innovations can be made anywhere along the path leading to a tech
@@ -175,6 +171,8 @@ plot_simulation <- function(output) {
   abline(0,sum(payoff)/length(payoff), lty=2)
 }
 
+techs <- create_techs()
+dependencies <- create_tech_tree()
 output <- run_simulation()
 plot_simulation(output)
 
