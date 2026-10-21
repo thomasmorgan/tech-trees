@@ -190,3 +190,51 @@ dependencies <- create_tech_tree()
 output <- run_simulation()
 plot_simulation(output)
 
+run_simulations_across_trees <- function(trees, n_repeats = 10) {
+  n_trees <- length(trees)
+  n_runs <- n_trees * n_repeats
+  
+  file <- paste0(n_trees, "x", n_repeats, "_results.rds")
+  if (file.exists(file)) {
+    results <- readRDS(file)
+  } else {
+    results <- vector("list", n_runs)
+  }
+  
+  run_id <- 0
+  for (i in seq_len(n_trees)) {
+    techs <<- trees[[i]]$techs
+    dependencies <<- trees[[i]]$dependencies
+    
+    for (j in seq_len(n_repeats)) {
+      run_id <- run_id + 1
+      
+      if (!is.null(results[[run_id]])) {
+        next
+      }
+      
+      output <- run_simulation()
+      results[[run_id]] <- list(
+        tree_id = i,
+        repeat_id = j,
+        output = output
+      )
+      
+      cat(paste0("\rCompleted ", run_id, "/", n_runs,
+                 " simulations (tree ", i, ", repeat ", j, ").\n"))
+      flush.console()
+      
+      # Write a temporary file first to protect the existing checkpoint.
+      if ((run_id %% 100) == 0 || run_id == n_runs) {
+        print("Writing to file...")
+        saveRDS(results, file = paste0(file, ".tmp"))
+        
+        if (!file.rename(paste0(file, ".tmp"), file)) {
+          stop("Could not replace the results file.")
+        }
+      }
+    }
+  }
+}
+
+
