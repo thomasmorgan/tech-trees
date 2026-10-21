@@ -237,4 +237,33 @@ run_simulations_across_trees <- function(trees, n_repeats = 10) {
   }
 }
 
+plot_multiple_simulations(results) {
+  runs <- length(results)
+  gens <- length(results[[1]]$output$n_known_techs)
+  plot(c(0, 1),c(0,1), col="white", xlim=c(0, gens), ylim=c(0, 20), xlab="Round", ylab="N known techs")
+  n_known <- rep(0, gens)
+  for (i in 1:runs) {
+    y <- results[[i]]$output$n_known_techs
+    if (runif(1, 0, 1) < 0.1) {
+      lines(y~c(1:gens), col=rgb(0, 0, 0, 0.1))
+    }
+    n_known <- n_known+y
+  }
+  n_known <- n_known/runs
+  lines(n_known~c(1:gens), lwd=3, col="black")
+  
+  
+  plot(c(0, 1),c(0,1), col="white", xlim=c(0, gens), ylim=c(0, 5), xlab="Round", ylab="Expected payoff")
+  e_payoff <- rep(0, gens)
+  for (i in 1:runs) {
+    y <- results[[i]]$output$expected_payoff
+    if (runif(1, 0, 1) < 0.05) {
+      lines(y~c(1:gens), col=rgb(0.3, 0, 0.05, 0.1))
+    }
+    e_payoff <- e_payoff+y
+  }
+  e_payoff <- e_payoff/runs
+  lines(e_payoff~c(1:gens), lwd=3, col="maroon")
+}
+
 
