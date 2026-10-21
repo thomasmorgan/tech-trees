@@ -185,10 +185,6 @@ plot_simulation <- function(output) {
   abline(0,sum(payoff)/length(payoff), lty=2)
 }
 
-techs <- create_techs()
-dependencies <- create_tech_tree()
-output <- run_simulation()
-plot_simulation(output)
 
 run_simulations_across_trees <- function(trees, n_repeats = 10) {
   n_trees <- length(trees)
@@ -265,5 +261,18 @@ plot_multiple_simulations(results) {
   e_payoff <- e_payoff/runs
   lines(e_payoff~c(1:gens), lwd=3, col="maroon")
 }
+
+
+# techs <- create_techs()
+# dependencies <- create_tech_tree()
+# output <- run_simulation()
+# plot_simulation(output)
+
+# generate_trees()
+# trees <- readRDS("1000_trees.rds")
+# run_simulations_across_trees(trees, n_repeats=3)
+results <- readRDS("1000x3_results.rds")
+plot_multiple_simulations(results)
+
 
 
