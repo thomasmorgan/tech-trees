@@ -209,3 +209,17 @@ plot_tech_tree <- function() {
   }
 }
 
+generate_trees <- function(n_trees = 1000) {
+  trees <- vector("list", n_trees)
+  for (i in seq_len(n_trees)) {
+    techs <- create_techs()
+    dependencies <- create_tech_tree()
+    trees[[i]] <- list(techs = techs, dependencies = dependencies)
+    cat(paste0("\rGenerated ", i, "/", n_trees, " trees."))
+    flush.console()
+  }
+  cat("\n")
+  
+  saveRDS(trees, file = paste0(n_trees, "_trees.rds"))
+}
+
