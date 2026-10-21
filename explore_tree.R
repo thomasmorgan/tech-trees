@@ -174,14 +174,14 @@ plot_simulation <- function(output) {
   
   
   # plot 4
-  plot(n_known_techs, ylim=c(0, max(n_known_techs)), type="l")
+  plot(n_known_techs, ylim=c(0, max(n_known_techs)), type="l", xlab="Round", ylab="Number of techs known")
   
   # plot 5
-  plot(expected_payoff, col="maroon", type="l")
+  plot(expected_payoff, col="maroon", type="l", xlab="Round", ylab="Expected payoff")
   
   # plot 6
   total_payoff <- cumsum(payoff)
-  plot(total_payoff, type="l")
+  plot(total_payoff, type="l", xlab="Round", ylab="Total accumulated payoff")
   abline(0,sum(payoff)/length(payoff), lty=2)
 }
 
