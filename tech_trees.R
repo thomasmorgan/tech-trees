@@ -170,7 +170,66 @@ create_tech_tree <- function() {
   return(dependencies)
 }
 
-plot_tech_tree <- function() {
+check_dependencies <- function(dependencies, foundational = 1:5) {
+  n <- nrow(dependencies)
+  
+  # Check the matrix itself.
+  if (!is.matrix(dependencies) ||
+      n != ncol(dependencies) ||
+      anyNA(dependencies) ||
+      !all(dependencies %in% -3:3)) {
+    stop("dependencies must be a square matrix containing codes -3 to 3.")
+  }
+  
+  if (!all(dependencies == -t(dependencies))) {
+    stop("dependencies must equal -t(dependencies).")
+  }
+  
+  if (anyNA(foundational) ||
+      !all(foundational %in% seq_len(n))) {
+    stop("foundational must contain valid technology indices.")
+  }
+  
+  # TRUE means the row technology is a prerequisite of the column.
+  edges <- matrix(
+    dependencies %in% c(1, 2, 3),
+    nrow = n,
+    ncol = n
+  )
+  
+  # Every non-foundational technology needs a prerequisite.
+  n_prerequisites <- colSums(edges)
+  missing_prerequisites <- setdiff(
+    which(n_prerequisites == 0),
+    foundational
+  )
+  
+  # Remove technologies whose prerequisites have already been removed.
+  remaining <- rep(TRUE, n)
+  ready <- which(n_prerequisites == 0)
+  
+  while (length(ready) > 0) {
+    remaining[ready] <- FALSE
+    
+    n_prerequisites <- n_prerequisites -
+      colSums(edges[ready, , drop = FALSE])
+    
+    ready <- which(remaining & n_prerequisites == 0)
+  }
+  
+  has_loop <- any(remaining)
+  
+  list(
+    valid = !has_loop && length(missing_prerequisites) == 0,
+    has_loop = has_loop,
+    missing_prerequisites = missing_prerequisites,
+    blocked_by_loops = which(remaining)
+  )
+  
+  return(!has_loop && length(missing_prerequisites) == 0)
+}
+
+plot_tech_tree <- function(techs_to_paint=c(1:nrow(techs))) {
   # plot tree
   
   #dot_sizes <- (((techs$all_dependencies/n_techs)^0.5)) * 50 / max_tier
