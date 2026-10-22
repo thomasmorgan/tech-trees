@@ -295,10 +295,11 @@ run_simulations_across_trees <- function(n_trees = 1000, n_repeats = 10) {
   }
 }
 
-plot_multiple_simulations(results) {
+plot_multiple_simulations <- function(results) {
+  par(mfrow=c(1,2))
   runs <- length(results)
   gens <- length(results[[1]]$output$n_known_techs)
-  plot(c(0, 1),c(0,1), col="white", xlim=c(0, gens), ylim=c(0, 20), xlab="Round", ylab="N known techs")
+  plot(c(0, 1),c(0,1), col="white", xlim=c(0, gens), ylim=c(0, 50), xlab="Round", ylab="N known techs")
   n_known <- rep(0, gens)
   for (i in 1:runs) {
     y <- results[[i]]$output$n_known_techs
@@ -327,6 +328,7 @@ plot_multiple_simulations(results) {
 
 # techs <- create_techs()
 # dependencies <- create_tech_tree()
+# check_dependencies(dependencies)
 # output <- run_simulation()
 # plot_simulation(output)
 
