@@ -35,6 +35,8 @@ run_simulation <- function() {
   n_known_techs <- rep(NA, generations)
   payoff <- rep(NA, generations)
   expected_payoff <- rep(NA, generations)
+  average_payoff <- rep(NA, generations)
+  knowledge_history <- vector("list", generations)
   
   # innovation loop
   for (i in 1:generations) {
@@ -51,6 +53,8 @@ run_simulation <- function() {
     payoff[i] <- sum(techs[sampled_tech,]$payoff)
     sampled_techs[[i]] <- sampled_tech
     expected_payoff[i] <- sum(known_payoffs*known_probs)
+    average_payoff[i] <- mean(known_payoffs)
+    knowledge_history[[i]] <- known_techs
     
     ### INNOVATE ###
     
@@ -121,7 +125,10 @@ run_simulation <- function() {
     sampled_techs=sampled_techs,
     n_known_techs=n_known_techs,
     payoff=payoff,
-    expected_payoff=expected_payoff
+    expected_payoff=expected_payoff,
+    known_techs=known_techs,
+    knowledge_history=knowledge_history,
+    average_payoff=average_payoff
   )
   return(output)
 }
@@ -133,16 +140,24 @@ plot_simulation <- function(output) {
   n_known_techs <- output$n_known_techs
   payoff <- output$payoff
   expected_payoff <- output$expected_payoff
+  known_techs <- output$known_techs
+  average_payoff <- output$average_payoff
   
-  par(mfrow=c(2, 3))
+  par(mfrow=c(3, 3))
   
   # panel 1
   plot_tech_tree()
+  title(main = "Full tree")
   
   # panel 2
+  plot_tech_tree(known_techs)
+  title(main = "Final known tree")
+  
   # panel 3
   plot_tech_tree(unique(unlist(sampled_techs)))
   title(main = "Ever Exploited tree")
+  
+  # panel 4
   incoming <- techs$direct_incoming_dependencies
   outgoing <- techs$direct_outgoing_dependencies
   
@@ -162,7 +177,7 @@ plot_simulation <- function(output) {
          fill = adjustcolor(c("maroon", "cornflowerblue"), alpha.f = 0.5))
   
   
-  # panel 3
+  # panel 5
   incoming <- techs$all_incoming_dependencies/nrow(techs)
   outgoing <- techs$all_outgoing_dependencies/nrow(techs)
   
@@ -182,16 +197,19 @@ plot_simulation <- function(output) {
          fill = adjustcolor(c("maroon", "cornflowerblue"), alpha.f = 0.5))
   
   
-  # plot 4
+  # plot 6
   plot(n_known_techs, ylim=c(0, max(n_known_techs)), type="l", xlab="Round", ylab="Number of techs known")
   
-  # plot 5
+  # plot 7
   plot(expected_payoff, col="maroon", type="l", xlab="Round", ylab="Expected payoff")
   
-  # plot 6
-  total_payoff <- cumsum(payoff)
-  plot(total_payoff, type="l", xlab="Round", ylab="Total accumulated payoff")
-  abline(0,sum(payoff)/length(payoff), lty=2)
+  # # plot 8
+  plot(average_payoff, col="forestgreen", type="l", xlab="Round", ylab="Average tech payoff")
+  
+  # plot 9
+  plot(n_known_techs*average_payoff, col="forestgreen", type="l", xlab="Round", ylab="Total knowledge value")
+}
+
 create_video <- function(output) {
   n_timesteps <- length(output$knowledge_history)
   av::av_capture_graphics(
