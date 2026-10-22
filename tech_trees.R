@@ -238,9 +238,11 @@ plot_tech_tree <- function(techs_to_paint=c(1:nrow(techs))) {
   pal <- hcl.colors(256, "viridis")
   dot_cols <- pal[pmin(1 + round(techs$payoff/6 * 255), 256)]
   
-  plot(techs$ypos~techs$xpos, bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes, col=dot_cols)
-  keystone_techs <- techs$id[techs$keystone == 1]
-  points(techs$ypos[keystone_techs]~techs$xpos[keystone_techs], pch=16, cex=dot_sizes[keystone_techs], col="purple")
+  plot(techs$ypos~techs$xpos, bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col="white")
+  points(techs$ypos[techs_to_paint]~techs$xpos[techs_to_paint], bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col=dot_cols[techs_to_paint])
+  # keystone_techs <- techs$id[techs$keystone == 1]
+  # points(techs$ypos[keystone_techs]~techs$xpos[keystone_techs], pch=16, cex=dot_sizes[keystone_techs], col="purple")
+  
   if (max_tier < 8) {
     for (i in 1:nrow(techs)) {
       text(techs$xpos[i], techs$ypos[i], techs$id[i], pos=1, offset=dot_sizes[i]*0.2 + 1/max_tier)
