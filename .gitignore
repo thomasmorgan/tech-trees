@@ -1,2 +1,4 @@
 *.rds
 .DS_Store
+.Rhistory
+*.mp4
