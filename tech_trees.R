@@ -248,8 +248,8 @@ plot_tech_tree <- function(techs_to_paint=c(1:nrow(techs))) {
       text(techs$xpos[i], techs$ypos[i], techs$id[i], pos=1, offset=dot_sizes[i]*0.2 + 1/max_tier)
     }
   }
-  for (i in 1:n_techs) {
-    for (j in 1:n_techs) {
+  for (i in techs_to_paint) {
+    for (j in techs_to_paint) {
       if (dependencies[i,j] == 1) {
         from <- techs[techs$id == i,]
         to <- techs[techs$id == j,]
