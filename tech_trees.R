@@ -23,7 +23,7 @@ create_techs <- function() {
     new_rows <- data.frame(
       id = ids,
       tier = rep(t, n_techs_tier),
-      payoff = rexp(n_techs_tier, 1),
+      payoff = rexp(n_techs_tier, 1/(payoff_growth_rate^(t-1))),
       keystone = round(runif(n_techs_tier, 0, 1) < p_keystone_tech)*1,
       xpos = ids - mean(ids),
       ypos = rep(t, n_techs_tier)
