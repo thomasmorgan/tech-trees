@@ -15,6 +15,7 @@ generations <- 20000  # how many goes
 p_innovate <- 1  # probability a tech that can be innovated, is innovated
 can_innovate_from_path <- FALSE # whether innovations can be made anywhere along the path leading to a tech
 greediness <- 1  # how aggressively do you exploit high paying techs?
+n_samples <- 5 # how many techs do you exploit per round
 p_forget <- 0.01 # probability a tech that can be forgotten, is forgotten
 can_forget_used_techs <- FALSE # can you forget a tech exploited on that turn
 can_forget_stem_techs <- TRUE # can you forget a tech than another known tech depends on
@@ -29,7 +30,7 @@ run_simulation <- function() {
 
   tier_1_techs <- techs$id[techs$tier == 1]
   known_techs <- tier_1_techs  # vector of known techs by ID
-  sampled_techs <- rep(NA, generations)  # vector for which tech is exploited on each step
+  sampled_techs <- vector("list", generations)  # list for which techs were exploited on each step
   n_known_techs <- rep(NA, generations)
   payoff <- rep(NA, generations)
   expected_payoff <- rep(NA, generations)
@@ -45,21 +46,22 @@ run_simulation <- function() {
     ### EXPLOIT ###
     known_payoffs <- techs$payoff[known_techs]
     known_probs <- known_payoffs^greediness/(sum(known_payoffs^greediness))
-    sampled_tech <- sample(known_techs, 1, prob=known_probs)
-    payoff[i] <- techs[sampled_tech,]$payoff
-    sampled_techs[i] <- sampled_tech
+    sampled_tech <- sample(known_techs, n_samples, prob=known_probs, replace=F)
+    payoff[i] <- sum(techs[sampled_tech,]$payoff)
+    sampled_techs[[i]] <- sampled_tech
     expected_payoff[i] <- sum(known_payoffs*known_probs)
     
     ### INNOVATE ###
     
     # which nodes might you innovate from
+    points_of_innovation <- c(sampled_tech)
     if (can_innovate_from_path) {
       # the exploited tech and all other techs it depends on
-      points_of_innovation <- c(sampled_tech, techs$id[dependencies[sampled_tech,] < 0])
-    } else {
-      # or just the exploited tech
-      points_of_innovation <- c(sampled_tech)
+      for (t in sampled_tech) {
+        points_of_innovation <- c(points_of_innovation, techs$id[dependencies[t,] < 0])
+      }
     }
+    points_of_innovation <- unique(points_of_innovation)
     
     # discover innovations
     for (p in points_of_innovation) { # for each point of innovation
@@ -137,6 +139,9 @@ plot_simulation <- function(output) {
   plot_tech_tree()
   
   # panel 2
+  # panel 3
+  plot_tech_tree(unique(unlist(sampled_techs)))
+  title(main = "Ever Exploited tree")
   incoming <- techs$direct_incoming_dependencies
   outgoing <- techs$direct_outgoing_dependencies
   
