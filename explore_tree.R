@@ -85,6 +85,17 @@ run_simulation <- function() {
           }
         }
       }
+      
+      # rediscover ancestors
+      ancestors <- techs$id[dependencies[p,] %in% c(-1, -2)]
+      # remove those we already know
+      unknown_ancestors <- ancestors[!ancestors %in% known_techs]
+      # for each of those, they can be innovated with a bit of luck, regardless of whether dependencies are known
+      for (t in unknown_ancestors) {
+        if (runif(1, 0, 1) < p_innovate) {
+          known_techs <- c(known_techs, t)
+        }
+      }
     }
     n_known_techs[i] <- length(known_techs)
     
