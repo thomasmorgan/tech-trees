@@ -7,7 +7,7 @@ max_tier <- 8 # number to tiers in tree
 tree_growth_rate <- 2 # rate at with tiers get wider
 payoff_growth_rate <- 1.1 # rate at which average payoff grows with tier (multiplicative)
 p_extra_dependency <- 0.001 # probability a given extra dependency is realized
-max_tier_gap_for_dependencies <- 99 # how many tiers extra dependencies can cross
+max_tier_gap_for_dependencies <- 2 # how many tiers extra dependencies can cross
 p_keystone_tech <- 0.00 # probability a tech is a keystone tech
 keystone_multiplier <- 10 # how much more likely keystone techs are to have extra dependencies
 
