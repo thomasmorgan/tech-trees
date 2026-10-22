@@ -12,12 +12,14 @@ p_keystone_tech <- 0.00 # probability a tech is a keystone tech
 keystone_multiplier <- 10 # how much more likely keystone techs are to have extra dependencies
 
 generations <- 20000  # how many goes
-can_innovate_from_path <- TRUE # whether innovations can be made anywhere along the path leading to a tech
 p_innovate <- 1  # probability a tech that can be innovated, is innovated
+can_innovate_from_path <- FALSE # whether innovations can be made anywhere along the path leading to a tech
 greediness <- 1  # how aggressively do you exploit high paying techs?
 p_forget <- 0.005 # probability a tech is forgotten
 can_forget_used_techs <- FALSE # can you forget a tech exploited on that turn
-can_forget_stem_techs <- FALSE # can you forget a tech than another known tehc depends on
+can_forget_stem_techs <- TRUE # can you forget a tech than another known tech depends on
+can_forget_tier_1_techs <- TRUE # can you forget techs right at the bottom of the tree
+forgetting_cascades <- FALSE # does forgetting a tech cause you to forget all techs that depend on it
 
 
 ### FUNCTIONS ###
