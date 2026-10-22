@@ -249,8 +249,7 @@ create_video <- function(output) {
 }
 
 
-run_simulations_across_trees <- function(trees, n_repeats = 10) {
-  n_trees <- length(trees)
+run_simulations_across_trees <- function(n_trees = 1000, n_repeats = 10) {
   n_runs <- n_trees * n_repeats
   
   file <- paste0(n_trees, "x", n_repeats, "_results.rds")
@@ -261,7 +260,7 @@ run_simulations_across_trees <- function(trees, n_repeats = 10) {
   }
   
   run_id <- 0
-  for (i in seq_len(n_trees)) {
+  for (i in 1:n_trees) {
     techs <<- trees[[i]]$techs
     dependencies <<- trees[[i]]$dependencies
     
