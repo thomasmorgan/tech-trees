@@ -127,7 +127,11 @@ run_simulation <- function() {
     # forget them with probability
     for (t in forgettable_techs) {
       if (runif(1, 0, 1) < p_forget) {
-        techs_to_forget <- c(t, techs$id[dependencies[t,] > 0])
+        techs_to_forget <- c(t)
+        if (forgetting_cascades) {
+          # also forget any that depend on the forgotten tech
+          techs_to_forget <- c(t, techs$id[dependencies[t,] > 0])
+        } 
         known_techs <- known_techs[!known_techs %in% techs_to_forget]
       }
     }
