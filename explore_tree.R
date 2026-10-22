@@ -105,7 +105,9 @@ run_simulation <- function() {
     forgettable_techs <- known_techs
     
     # cannot forget tier 1 techs!
-    forgettable_techs <- forgettable_techs[!forgettable_techs %in% tier_1_techs]
+    if (!can_forget_tier_1_techs) {
+      forgettable_techs <- forgettable_techs[!forgettable_techs %in% tier_1_techs]
+    }
     
     # can you forgets techs you just used?
     if (!can_forget_used_techs) {
