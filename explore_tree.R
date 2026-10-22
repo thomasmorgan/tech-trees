@@ -1,3 +1,4 @@
+library(av)
 source("tech_trees.R")
 
 ### EDITABLE PARAMETERS ###
@@ -191,6 +192,25 @@ plot_simulation <- function(output) {
   total_payoff <- cumsum(payoff)
   plot(total_payoff, type="l", xlab="Round", ylab="Total accumulated payoff")
   abline(0,sum(payoff)/length(payoff), lty=2)
+create_video <- function(output) {
+  n_timesteps <- length(output$knowledge_history)
+  av::av_capture_graphics(
+    {
+      for (t in 1:n_timesteps) {
+        gen_percent <- max(1, floor(n_timesteps / 50))
+        if (t %% gen_percent == 0 || t == n_timesteps) {
+          cat(sprintf("\rProgress: %.0f%%", 100 * t / n_timesteps))
+          flush.console()
+        }
+        plot_tech_tree(techs_to_paint = output$knowledge_history[[t]])
+        title(main = paste("Timestep", t))
+      }
+    },
+    output = "tech_tree.mp4",
+    width = 800,
+    height = 800,
+    framerate = 60
+  )
 }
 
 
