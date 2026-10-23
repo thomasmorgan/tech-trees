@@ -258,19 +258,18 @@ check_dependencies <- function(dependencies, foundational = 1:5) {
   return(!has_loop && length(missing_prerequisites) == 0)
 }
 
-plot_tech_tree <- function(techs_to_paint=c(1:nrow(techs))) {
-  # plot tree
+plot_tech_tree <- function(tree, techs_to_paint=c(1:nrow(tree$techs))) {
+  techs <- tree$techs
+  dependencies <- tree$dependencies
   
-  #dot_sizes <- (((techs$all_dependencies/n_techs)^0.5)) * 50 / max_tier
-  #dot_sizes <- (techs$all_dependencies/n_techs)^0.5*50 / max_tier
-  dot_sizes <- techs$payoff
+  dot_sizes <- techs$payoff^plotting_scale_parameter
+  dot_sizes <- dot_sizes/max(dot_sizes)*5
+  
+  dot_cols <- round(1 + 255*(dot_sizes/max(dot_sizes)))
   pal <- hcl.colors(256, "viridis")
-  dot_cols <- pal[pmin(1 + round(techs$payoff/6 * 255), 256)]
   
   plot(techs$ypos~techs$xpos, bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col="white")
-  points(techs$ypos[techs_to_paint]~techs$xpos[techs_to_paint], bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col=dot_cols[techs_to_paint])
-  # keystone_techs <- techs$id[techs$keystone == 1]
-  # points(techs$ypos[keystone_techs]~techs$xpos[keystone_techs], pch=16, cex=dot_sizes[keystone_techs], col="purple")
+  points(techs$ypos[techs_to_paint]~techs$xpos[techs_to_paint], bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col = pal[dot_cols[techs_to_paint]])
   
   if (max_tier < 8) {
     for (i in 1:nrow(techs)) {
