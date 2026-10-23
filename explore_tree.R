@@ -29,7 +29,9 @@ forgetting_cascades <- FALSE # does forgetting a tech cause you to forget all te
 ### FUNCTIONS ###
 
 # a single mind explores the tree
-run_simulation <- function() {
+run_simulation <- function(tree) {
+  techs <- tree$techs
+  dependencies <- tree$dependencies
 
   tier_1_techs <- techs$id[techs$tier == 1]
   known_techs <- tier_1_techs  # vector of known techs by ID
@@ -153,7 +155,10 @@ run_simulation <- function() {
 }
 
 
-plot_simulation <- function(output) {
+plot_simulation <- function(tree, output) {
+  
+  techs <- tree$techs
+  dependencies <- tree$dependencies
     
   sampled_techs <- output$sampled_techs
   n_known_techs <- output$n_known_techs
@@ -165,15 +170,15 @@ plot_simulation <- function(output) {
   par(mfrow=c(3, 3))
   
   # panel 1
-  plot_tech_tree()
+  plot_tech_tree(tree)
   title(main = "Full tree")
   
   # panel 2
-  plot_tech_tree(known_techs)
+  plot_tech_tree(tree, known_techs)
   title(main = "Final known tree")
   
   # panel 3
-  plot_tech_tree(unique(unlist(sampled_techs)))
+  plot_tech_tree(tree, unique(unlist(sampled_techs)))
   title(main = "Ever Exploited tree")
   
   # panel 4
@@ -229,7 +234,7 @@ plot_simulation <- function(output) {
   plot(n_known_techs*average_payoff, col="forestgreen", type="l", xlab="Round", ylab="Total knowledge value")
 }
 
-create_video <- function(output) {
+create_video <- function(tree, output, stepsize=1) {
   n_timesteps <- length(output$knowledge_history)
   av::av_capture_graphics(
     {
@@ -327,18 +332,15 @@ plot_multiple_simulations <- function(results) {
   lines(e_payoff~c(1:gens), lwd=3, col="maroon")
 }
 
-
-# techs <- create_techs()
-# dependencies <- create_tech_tree()
-# check_dependencies(dependencies)
-# output <- run_simulation()
-# plot_simulation(output)
-
-# generate_trees()
-# trees <- readRDS("1000_trees.rds")
-# run_simulations_across_trees(trees, n_repeats=3)
-results <- readRDS("1000x3_results.rds")
-plot_multiple_simulations(results)
+tree <- create_tech_tree()
+output <- run_simulation(tree)
+plot_simulation(tree, output)
+# create_video(tree, output, 10)
+# generate_trees(1001)
+# trees <- readRDS("1001_trees.rds")
+# run_simulations_across_trees(n_trees=1001, n_repeats=5)
+# results <- readRDS("1001x5_results.rds")
+# plot_multiple_simulations(results)
 
 
 
