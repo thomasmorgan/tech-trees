@@ -42,6 +42,54 @@ create_techs <- function() {
 }
 
 create_tech_tree <- function() {
+  techs <- create_techs()
+  dependencies <- create_dependency_matrix(techs)
+  if (check_dependencies(dependencies)) {
+    print("Tree is good.")
+  } else {
+    print("Warning, tree contains loops!")
+  }
+  
+  # horizontally reorder techs to make tree nicer looking
+  for (i in 2:max_tier) {  # go through all tiers, starting with tier 3
+    this_tier_ids <- techs[techs$tier == i,]$id  # first get the ids of the techs in this tier
+    parents <- parent_xpos <- vector()
+    for (t in this_tier_ids) {
+      parent <- techs[techs$id == match(1, dependencies[,t])[1],]
+      parents <- c(parents, parent$id)  # then get the techs from the prior tier these techs depend on
+      parent_xpos <- c(parent_xpos, parent$xpos)  # and get their xpos' too
+    }
+    ord <- order(parent_xpos, this_tier_ids)  # get order of parents' xposs, breaking by offspring id
+    ordered_ids <- this_tier_ids[ord]   # order the ids according to this
+    techs$xpos[match(ordered_ids, techs$id)] <- seq_along(ordered_ids) - mean(seq_along(ordered_ids))  # insert into db
+  }
+  
+  # calculate total number of dependencies
+  techs$direct_outgoing_dependencies <- rowSums((dependencies > 0) * (dependencies < 3))
+  techs$direct_incoming_dependencies <- rowSums((dependencies < 0) * (dependencies > -3))
+  techs$all_outgoing_dependencies <- rowSums(dependencies > 0)
+  techs$all_incoming_dependencies <- rowSums(dependencies < 0)
+  
+  # calculate how hard each tech is to discover
+  tier_1_techs <- techs$id[techs$tier == 1]
+  techs$innovations_required <- rowSums(
+    dependencies[, -(tier_1_techs), drop = FALSE] < 0
+  ) + 1L
+  # Foundational techs are already known.
+  techs$innovations_required[tier_1_techs] <- 0L
+  
+  # assign payoffs
+  techs$payoff <- rexp(nrow(techs), 1/((1 + payoff_growth_rate)^techs$innovations_required))
+  techs$payoff <- techs$payoff/mean(techs$payoff)
+  
+  tree <- list(
+    techs=techs,
+    dependencies=dependencies
+  )
+  return(tree)
+}
+  
+create_dependency_matrix <- function(techs) {
   # initialize dependencies:
   # "dependencies" is a n-by-n matrix that scores the relationship between every pair of techs
   dependencies <- matrix(0, nrow=n_techs, ncol=n_techs)
@@ -85,20 +133,6 @@ create_tech_tree <- function() {
         }
       }
     }
-  }
-  
-  # horizontally reorder techs to make tree nicer looking
-  for (i in 2:max_tier) {  # go through all tiers, starting with tier 3
-    this_tier_ids <- techs[techs$tier == i,]$id  # first get the ids of the techs in this tier
-    parents <- parent_xpos <- vector()
-    for (t in this_tier_ids) {
-      parent <- techs[techs$id == match(1, dependencies[,t])[1],]
-      parents <- c(parents, parent$id)  # then get the techs from the prior tier these techs depend on
-      parent_xpos <- c(parent_xpos, parent$xpos)  # and get their xpos' too
-    }
-    ord <- order(parent_xpos, this_tier_ids)  # get order of parents' xposs, breaking by offspring id
-    ordered_ids <- this_tier_ids[ord]   # order the ids according to this
-    techs$xpos[match(ordered_ids, techs$id)] <<- seq_along(ordered_ids) - mean(seq_along(ordered_ids))  # insert into db
   }
   
   # add some extra dependencies
@@ -160,12 +194,6 @@ create_tech_tree <- function() {
       }
     }
   }
-  
-  # calculate total number of dependencies
-  techs$direct_outgoing_dependencies <<- rowSums((dependencies > 0) * (dependencies < 3))
-  techs$direct_incoming_dependencies <<- rowSums((dependencies < 0) * (dependencies > -3))
-  techs$all_outgoing_dependencies <<- rowSums(dependencies > 0)
-  techs$all_incoming_dependencies <<- rowSums(dependencies < 0)
 
   return(dependencies)
 }
