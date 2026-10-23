@@ -220,18 +220,21 @@ plot_simulation <- function(tree, output) {
   legend("topright", legend = c("Incoming", "Outgoing"),
          fill = adjustcolor(c("maroon", "cornflowerblue"), alpha.f = 0.5))
   
-  
   # plot 6
-  plot(n_known_techs, ylim=c(0, max(n_known_techs)), type="l", xlab="Round", ylab="Number of techs known")
+  plot(techs$innovations_required~techs$tier, pch=16, xlab="Tier", ylab="Innovations required to discover")
   
   # plot 7
-  plot(expected_payoff, col="maroon", type="l", xlab="Round", ylab="Expected payoff")
+  plot(techs$payoff~techs$innovations_required, xlab="Innovations required", ylab="Payoff", log="y")
   
-  # # plot 8
-  plot(average_payoff, col="forestgreen", type="l", xlab="Round", ylab="Average tech payoff")
+  # plot 8
+  plot(n_known_techs, ylim=c(0, max(c(n_known_techs, n_known_techs*average_payoff))), type="l", xlab="Round", ylab="Number of techs known")
+  lines(n_known_techs*average_payoff, col="forestgreen", type="l", xlab="Round", ylab="Total knowledge value")
+  legend(0, max(c(n_known_techs, n_known_techs*average_payoff)), c("N known", "Summed payoffs"), col=c("black", "forestgreen"), lwd=c(1, 1), bty="n")
   
   # plot 9
-  plot(n_known_techs*average_payoff, col="forestgreen", type="l", xlab="Round", ylab="Total knowledge value")
+  plot(expected_payoff, col="maroon", type="l", xlab="Round", ylab="Payoff", ylim=c(0, max(c(expected_payoff, average_payoff))))
+  lines(average_payoff, col="forestgreen", type="l")
+  legend(0, max(c(expected_payoff, average_payoff)), c("Expected", "Average"), col=c("maroon", "forestgreen"), bty="n", lwd=1)
 }
 
 create_video <- function(tree, output, stepsize=1) {
