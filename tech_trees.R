@@ -144,7 +144,9 @@ create_dependency_matrix <- function(techs) {
   pairs$parent_tier <- techs$tier[match(pairs$from, techs$id)]
   pairs$child_tier  <- techs$tier[match(pairs$to, techs$id)]
   pairs$tier_delta <- pairs$child_tier - pairs$parent_tier
+  pairs <- pairs[pairs$tier_delta %in% extra_dependency_tier_gaps,]
   pairs <- pairs[sample(nrow(pairs)), ]
+  
   
   for (i in 1:nrow(pairs)) {
     pair <- pairs[i,]
@@ -155,8 +157,6 @@ create_dependency_matrix <- function(techs) {
     
     if ((parent != child) &
         (dependencies[parent, child] == 0) &
-        (abs(tier_delta) <= max_tier_gap_for_dependencies) &
-        ((tier_delta > 0) | allow_backwards_dependencies) &
         (pair$parent_tier > 1) &
         (pair$child_tier > 1)) {
       p_link <- p_extra_dependency
