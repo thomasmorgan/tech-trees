@@ -247,14 +247,17 @@ create_video <- function(tree, output, stepsize=1) {
           cat(sprintf("\rProgress: %.0f%%", 100 * t / n_timesteps))
           flush.console()
         }
-        plot_tech_tree(techs_to_paint = output$knowledge_history[[t]])
-        title(main = paste("Timestep", t))
+        if (t %% stepsize == 0) {
+          plot_tech_tree(tree, techs_to_paint = output$knowledge_history[[t]])
+          title(main = paste("Timestep", t))
+        }
       }
     },
     output = "tech_tree.mp4",
     width = 800,
     height = 800,
-    framerate = 60
+    framerate = 60,
+    type = "cairo"
   )
 }
 
