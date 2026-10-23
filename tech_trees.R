@@ -260,6 +260,9 @@ plot_tech_tree <- function(tree, techs_to_paint=c(1:nrow(tree$techs))) {
   techs <- tree$techs
   dependencies <- tree$dependencies
   
+  payoff_ratio <- max(techs$payoff) / min(techs$payoff)
+  plotting_scale_parameter <- log(10)/log(payoff_ratio)
+  
   dot_sizes <- techs$payoff^plotting_scale_parameter
   dot_sizes <- dot_sizes/max(dot_sizes)*5
   

@@ -8,7 +8,6 @@ max_tier <- 8 # number to tiers in tree
 tree_growth_rate <- 2 # rate at with tiers get wider
 p_extra_dependency <- 0.001 # probability a given extra dependency is realized
 payoff_growth_rate <- 0.2 # rate at which average payoff grows with tier (multiplicative)
-plotting_scale_parameter <- 0.2 # parameter that controls dot sizes on the plots, lower it to homogenize dots
 extra_dependency_tier_gaps <- c(1) # permitted tier gaps for extra dependencies
 p_keystone_tech <- 0.00 # probability a tech is a keystone tech
 keystone_multiplier <- 10 # how much more likely keystone techs are to have extra dependencies
