@@ -77,7 +77,7 @@ create_tech_tree <- function() {
   techs$innovations_required[tier_1_techs] <- 0L
   
   # assign payoffs
-  techs$payoff <- rexp(nrow(techs), 1/((1 + payoff_growth_rate)^techs$innovations_required))
+  techs$payoff <- rexp(nrow(techs), 1/(payoff_growth_rate^techs$innovations_required))
   techs$payoff <- techs$payoff/mean(techs$payoff)
   
   tree <- list(
