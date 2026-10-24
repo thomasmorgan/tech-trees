@@ -9,6 +9,7 @@ tree_growth_rate <- 2 # rate at with tiers get wider
 p_extra_dependency <- 0.001 # probability a given extra dependency is realized
 payoff_growth_rate <- 1.2 # rate at which average payoff grows with dependencies (multiplicative)
 # prob that an extra dependency leads to a better payoff is (payoff_growth_rate / (1+payoff_growth_rate))
+new_dependency_method <- TRUE # do we use the new method for generating dependencies?
 extra_dependency_tier_gaps <- c(1) # permitted tier gaps for extra dependencies
 p_keystone_tech <- 0.00 # probability a tech is a keystone tech
 keystone_multiplier <- 10 # how much more likely keystone techs are to have extra dependencies
