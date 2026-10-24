@@ -156,7 +156,7 @@ run_simulation <- function(tree) {
 }
 
 
-plot_simulation <- function(tree, output) {
+plot_simulation <- function(tree, output, by_tier=TRUE) {
   
   techs <- tree$techs
   dependencies <- tree$dependencies
@@ -171,15 +171,15 @@ plot_simulation <- function(tree, output) {
   par(mfrow=c(3, 3))
   
   # panel 1
-  plot_tech_tree(tree)
+  plot_tech_tree(tree, by_tier=by_tier)
   title(main = "Full tree")
   
   # panel 2
-  plot_tech_tree(tree, known_techs)
+  plot_tech_tree(tree, known_techs, by_tier=by_tier)
   title(main = "Final known tree")
   
   # panel 3
-  plot_tech_tree(tree, unique(unlist(sampled_techs)))
+  plot_tech_tree(tree, unique(unlist(sampled_techs)), by_tier=by_tier)
   title(main = "Ever Exploited tree")
   
   # panel 4
@@ -238,7 +238,7 @@ plot_simulation <- function(tree, output) {
   legend(0, max(c(expected_payoff, average_payoff)), c("Expected", "Average"), col=c("maroon", "forestgreen"), bty="n", lwd=1)
 }
 
-create_video <- function(tree, output, stepsize=1) {
+create_video <- function(tree, output, stepsize=1, by_tier=TRUE) {
   n_timesteps <- length(output$knowledge_history)
   av::av_capture_graphics(
     {
@@ -249,7 +249,7 @@ create_video <- function(tree, output, stepsize=1) {
           flush.console()
         }
         if (t %% stepsize == 0) {
-          plot_tech_tree(tree, techs_to_paint = output$knowledge_history[[t]])
+          plot_tech_tree(tree, techs_to_paint = output$knowledge_history[[t]], by_tier=by_tier)
           title(main = paste("Timestep", t))
         }
       }
@@ -340,9 +340,10 @@ plot_multiple_simulations <- function(results) {
 }
 
 tree <- create_tech_tree()
-output <- run_simulation(tree)
-plot_simulation(tree, output)
-# create_video(tree, output, 10)
+plot_tech_tree(tree, by_tier=FALSE)
+# output <- run_simulation(tree)
+# plot_simulation(tree, output, by_tier=FALSE)
+# create_video(tree, output, 5, by_tier=FALSE)
 # generate_trees(1001)
 # trees <- readRDS("1001_trees.rds")
 # run_simulations_across_trees(n_trees=1001, n_repeats=5)

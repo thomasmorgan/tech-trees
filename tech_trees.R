@@ -306,7 +306,7 @@ check_dependencies <- function(dependencies, foundational = 1:5) {
   return(!has_loop && length(missing_prerequisites) == 0)
 }
 
-plot_tech_tree <- function(tree, techs_to_paint=c(1:nrow(tree$techs))) {
+plot_tech_tree <- function(tree, techs_to_paint=c(1:nrow(tree$techs)),by_tier=TRUE) {
   techs <- tree$techs
   dependencies <- tree$dependencies
   
@@ -319,12 +319,18 @@ plot_tech_tree <- function(tree, techs_to_paint=c(1:nrow(tree$techs))) {
   dot_cols <- round(1 + 255*(dot_sizes/max(dot_sizes)))
   pal <- hcl.colors(256, "viridis")
   
-  plot(techs$ypos~techs$xpos, bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col="white")
-  points(techs$ypos[techs_to_paint]~techs$xpos[techs_to_paint], bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col = pal[dot_cols[techs_to_paint]])
+  if (by_tier) {
+    ys <- techs$ypos
+  } else {
+    ys <- techs$innovations_required
+  }
+  
+  plot(ys~techs$xpos, bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col="white")
+  points(ys[techs_to_paint]~techs$xpos[techs_to_paint], bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col = pal[dot_cols[techs_to_paint]])
   
   if (max_tier < 8) {
     for (i in 1:nrow(techs)) {
-      text(techs$xpos[i], techs$ypos[i], techs$id[i], pos=1, offset=dot_sizes[i]*0.2 + 1/max_tier)
+      text(techs$xpos[i], ys[i], techs$id[i], pos=1, offset=dot_sizes[i]*0.2 + 1/max_tier)
     }
   }
   for (i in techs_to_paint) {
@@ -332,13 +338,13 @@ plot_tech_tree <- function(tree, techs_to_paint=c(1:nrow(tree$techs))) {
       if (dependencies[i,j] == 1) {
         from <- techs[techs$id == i,]
         to <- techs[techs$id == j,]
-        lines(c(from$ypos, to$ypos)~c(from$xpos, to$xpos), lwd=(to$all_dependencies/n_techs * 10 + 0.5))
+        lines(c(ys[i], ys[j])~c(from$xpos, to$xpos), lwd=(to$all_dependencies/n_techs * 10 + 0.5))
       }
       if (dependencies[i,j] == 2) {
         from <- techs[techs$id == i,]
         to <- techs[techs$id == j,]
-        arrows(from$xpos, from$ypos,
-               to$xpos, to$ypos,
+        arrows(from$xpos, ys[i],
+               to$xpos, ys[j],
                length = 0.1,
                col="firebrick",
                angle = 25,
