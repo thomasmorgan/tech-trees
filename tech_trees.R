@@ -1,8 +1,7 @@
 
 # function to generate number of techs in each tier
 num_techs_per_tier <- function(tier) {
-  if (tree_growth_rate < 0.01) { return(starting_techs) }
-  return(round((tier + (starting_techs)^(1/tree_growth_rate) - 1)^tree_growth_rate))
+  return(round(starting_techs*tree_growth_rate^(tier-1)))
 }
 
 create_techs <- function() {
