@@ -134,113 +134,70 @@ create_dependency_matrix <- function(techs) {
   # these can occur between any possible techs
   # as long as they don't already have a dependency of any kind
   # and as long as they are not too many tiers apart
-  pairs <- expand.grid(
-    from = 1:n_techs,
-    to   = 1:n_techs
-  )
-  pairs$parent_tier <- techs$tier[match(pairs$from, techs$id)]
-  pairs$child_tier  <- techs$tier[match(pairs$to, techs$id)]
-  pairs$tier_delta <- pairs$child_tier - pairs$parent_tier
-  pairs <- pairs[pairs$tier_delta %in% extra_dependency_tier_gaps,]
-  pairs <- pairs[sample(nrow(pairs)), ]
   
-  # NEW Method
-  if (new_dependency_method) {
-    for (parent in 1:nrow(techs)) {
-      possible_children <- pairs$to[
-        pairs$from == parent & # only your kids
-        pairs$to != parent & # can't be yourself
-        dependencies[parent,pairs$to] == 0 & # no existing connection
-        pairs$parent_tier != 1 & # cannot be from tier 1
-        pairs$child_tier != 1 # cannot be to tier 1
-      ]
-      n_children <- rpois(1, p_extra_dependency)
-      n_children <- min(n_children, length(possible_children))
-      children <- sample(possible_children, n_children, replace=F)
+  for (t in 1:nrow(techs)) {
+    tech <- techs[t,]
+    # cannot be tier 1 as tier 1 has no dependencies
+    if (tech$tier > 1) {
       
-      for (child in children) {
-        dependencies[parent, child] <- 2
-        dependencies[child, parent] <- -2
-    
-        ancestors <- which(dependencies[parent, ] < 0)
-        descendants <- which(dependencies[child, ] > 0)
-    
-        for (ancestor in ancestors) {
-          for (descendant in descendants) {
-            if (dependencies[ancestor, descendant] == 0) {
-              dependencies[ancestor, descendant] <- 3
-              dependencies[descendant, ancestor] <- -3
-            }
-          }
-        }
-    
-        for (descendant in descendants) {
-          if (dependencies[parent, descendant] %in% c(0,2)) {
-            dependencies[parent, descendant] <- 3
-            dependencies[descendant, parent] <- -3
-          }
-        }
-    
-        for (ancestor in ancestors) {
-          if (dependencies[ancestor, child] %in% c(0, 2)) {
-            dependencies[ancestor, child] <- 3
-            dependencies[child, ancestor] <- -3
-          }
-        }
-      }
-    }
-    
-  } else {
+      # how many extra dependencies do they get
+      n_parents <- rpois(1, p_extra_dependency)
 
-    # OLD DEPENDENCY METHOD
-  
-    for (i in 1:nrow(pairs)) {
-      pair <- pairs[i,]
-      parent <- pair$from
-      child <- pair$to
-      tier_delta <- pair$tier_delta
-  
-  
-      if ((parent != child) &
-          (dependencies[parent, child] == 0) &
-          (pair$parent_tier > 1) &
-          (pair$child_tier > 1)) {
-        p_link <- p_extra_dependency
-        if (techs$keystone[techs$id == parent] == 1) { p_link <- p_link * keystone_multiplier }
-        if (runif(1,0,1) < p_link) {
-          dependencies[parent, child] <- 2
-          dependencies[child, parent] <- -2
-  
-          ancestors <- which(dependencies[parent, ] < 0)
-          descendants <- which(dependencies[child, ] > 0)
-  
-          for (ancestor in ancestors) {
-            for (descendant in descendants) {
-              if (dependencies[ancestor, descendant] == 0) {
-                dependencies[ancestor, descendant] <- 3
-                dependencies[descendant, ancestor] <- -3
+      # add them one at a time
+      if (n_parents > 0) {
+        for (xp in 1:n_parents) {
+          
+          # only permitted tiers
+          possible_parents <- techs[(tech$tier - techs$tier) %in% extra_dependency_tier_gaps,]
+          
+          # not yourself
+          possible_parents <- possible_parents[possible_parents$id != tech$id,]
+          
+          # no existing connection
+          possible_parents <- possible_parents[dependencies[possible_parents$id,tech$id] == 0,]
+          
+          # get just ids
+          possible_parents <- possible_parents$id
+        
+          if (length(possible_parents) > 0) {
+            # sample parent
+            parent <- sample(possible_parents, 1, replace=F)
+        
+            # connect them
+            dependencies[parent, tech$id] <- 2
+            dependencies[tech$id, parent] <- -2
+          
+            ancestors <- which(dependencies[parent, ] < 0)
+            descendants <- which(dependencies[tech$id, ] > 0)
+          
+            # update distant relatives accordingly
+            for (ancestor in ancestors) {
+              for (descendant in descendants) {
+                if (dependencies[ancestor, descendant] == 0) {
+                  dependencies[ancestor, descendant] <- 3
+                  dependencies[descendant, ancestor] <- -3
+                }
               }
             }
-          }
-  
-          for (descendant in descendants) {
-            if (dependencies[parent, descendant] %in% c(0,2)) {
-              dependencies[parent, descendant] <- 3
-              dependencies[descendant, parent] <- -3
+          
+            for (descendant in descendants) {
+              if (dependencies[parent, descendant] %in% c(0,2)) {
+                dependencies[parent, descendant] <- 3
+                dependencies[descendant, parent] <- -3
+              }
             }
-          }
-  
-          for (ancestor in ancestors) {
-            if (dependencies[ancestor, child] %in% c(0, 2)) {
-              dependencies[ancestor, child] <- 3
-              dependencies[child, ancestor] <- -3
+            
+            for (ancestor in ancestors) {
+              if (dependencies[ancestor, tech$id] %in% c(0, 2)) {
+                dependencies[ancestor, tech$id] <- 3
+                dependencies[tech$id, ancestor] <- -3
+              }
             }
           }
         }
       }
     }
   }
-
   return(dependencies)
 }
 
