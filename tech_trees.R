@@ -314,10 +314,10 @@ plot_tech_tree <- function(tree, techs_to_paint=c(1:nrow(tree$techs)),by_tier=TR
 generate_trees <- function(n_trees = 1000) {
   trees <- vector("list", n_trees)
   for (i in seq_len(n_trees)) {
-    techs <- create_techs()
-    dependencies <- create_tech_tree()
-    trees[[i]] <- list(techs = techs, dependencies = dependencies)
-    cat(paste0("\rGenerated ", i, "/", n_trees, " trees."))
+    tree <- create_tech_tree()
+    valid <- check_dependencies(tree$dependencies)
+    trees[[i]] <- tree
+    cat(paste0("\rGenerated ", i, "/", n_trees, " trees. [", valid, "]"))
     flush.console()
   }
   cat("\n")
