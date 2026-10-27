@@ -290,8 +290,7 @@ run_simulations_across_trees <- function(n_trees = 1000, n_repeats = 10) {
   
   run_id <- 0
   for (i in 1:n_trees) {
-    techs <<- trees[[i]]$techs
-    dependencies <<- trees[[i]]$dependencies
+    tree <- trees[[i]]
     
     for (j in seq_len(n_repeats)) {
       run_id <- run_id + 1
@@ -300,7 +299,7 @@ run_simulations_across_trees <- function(n_trees = 1000, n_repeats = 10) {
         next
       }
       
-      output <- run_simulation()
+      output <- run_simulation(tree)
       results[[run_id]] <- list(
         tree_id = i,
         repeat_id = j,
