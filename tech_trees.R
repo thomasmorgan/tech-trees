@@ -275,12 +275,14 @@ plot_tech_tree <- function(tree, techs_to_paint=c(1:nrow(tree$techs)),by_tier=TR
   
   if (by_tier) {
     ys <- techs$ypos
+    ylab <- "Tier"
   } else {
     ys <- techs$innovations_required
+    ylab <- "Complexity"
   }
   
-  plot(ys~techs$xpos, bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col="white")
-  points(ys[techs_to_paint]~techs$xpos[techs_to_paint], bty="n", xlab="", xaxt="n", ylab="tier", pch=16, cex=dot_sizes[techs_to_paint], col = pal[dot_cols[techs_to_paint]])
+  plot(ys~techs$xpos, bty="n", xlab="", xaxt="n", ylab=ylab, pch=16, cex=dot_sizes[techs_to_paint], col="white")
+  points(ys[techs_to_paint]~techs$xpos[techs_to_paint], bty="n", xaxt="n", pch=16, cex=dot_sizes[techs_to_paint], col = pal[dot_cols[techs_to_paint]])
   
   if (max_tier < 8) {
     for (i in 1:nrow(techs)) {
