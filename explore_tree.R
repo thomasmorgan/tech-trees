@@ -19,7 +19,7 @@ p_innovate <- 1  # probability a tech that can be innovated, is innovated
 can_innovate_from_path <- FALSE # whether innovations can be made anywhere along the path leading to a tech
 greediness <- 1  # how aggressively do you exploit high paying techs?
 n_samples <- 5 # how many techs do you exploit per round
-p_forget <- 0.01 # probability a tech that can be forgotten, is forgotten
+p_forget <- 0.0 # probability a tech that can be forgotten, is forgotten
 can_forget_used_techs <- FALSE # can you forget a tech exploited on that turn
 can_forget_stem_techs <- TRUE # can you forget a tech than another known tech depends on
 can_forget_tier_1_techs <- TRUE # can you forget techs right at the bottom of the tree
