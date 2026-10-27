@@ -105,38 +105,40 @@ run_simulation <- function(tree) {
     
     ### FORGET ###
     
-    # which techs might be forgotten
-    forgettable_techs <- known_techs
-    
-    # cannot forget tier 1 techs!
-    if (!can_forget_tier_1_techs) {
-      forgettable_techs <- forgettable_techs[!forgettable_techs %in% tier_1_techs]
-    }
-    
-    # can you forgets techs you just used?
-    if (!can_forget_used_techs) {
-      forgettable_techs <- forgettable_techs[!forgettable_techs %in% points_of_innovation]
-    }
-    
-    # can you forget techs that other known techs depend on?
-    if (!can_forget_stem_techs) {
-      for (t in forgettable_techs) {
-        dependers <- techs$id[dependencies[t,] > 0]
-        if (any(dependers %in% known_techs)) {
-          forgettable_techs <- forgettable_techs[forgettable_techs != t]
+    if (p_forget > 0) {
+      # which techs might be forgotten
+      forgettable_techs <- known_techs
+      
+      # cannot forget tier 1 techs!
+      if (!can_forget_tier_1_techs) {
+        forgettable_techs <- forgettable_techs[!forgettable_techs %in% tier_1_techs]
+      }
+      
+      # can you forgets techs you just used?
+      if (!can_forget_used_techs) {
+        forgettable_techs <- forgettable_techs[!forgettable_techs %in% points_of_innovation]
+      }
+      
+      # can you forget techs that other known techs depend on?
+      if (!can_forget_stem_techs) {
+        for (t in forgettable_techs) {
+          dependers <- techs$id[dependencies[t,] > 0]
+          if (any(dependers %in% known_techs)) {
+            forgettable_techs <- forgettable_techs[forgettable_techs != t]
+          }
         }
       }
-    }
-    
-    # forget them with probability
-    for (t in forgettable_techs) {
-      if (runif(1, 0, 1) < p_forget) {
-        techs_to_forget <- c(t)
-        if (forgetting_cascades) {
-          # also forget any that depend on the forgotten tech
-          techs_to_forget <- c(t, techs$id[dependencies[t,] > 0])
-        } 
-        known_techs <- known_techs[!known_techs %in% techs_to_forget]
+      
+      # forget them with probability
+      for (t in forgettable_techs) {
+        if (runif(1, 0, 1) < p_forget) {
+          techs_to_forget <- c(t)
+          if (forgetting_cascades) {
+            # also forget any that depend on the forgotten tech
+            techs_to_forget <- c(t, techs$id[dependencies[t,] > 0])
+          } 
+          known_techs <- known_techs[!known_techs %in% techs_to_forget]
+        }
       }
     }
     
