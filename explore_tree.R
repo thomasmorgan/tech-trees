@@ -182,6 +182,7 @@ plot_simulation <- function(tree, output, by_tier=TRUE) {
   title(main = "Ever Exploited tree")
   
   # panel 4
+  
   incoming <- techs$direct_incoming_dependencies
   outgoing <- techs$direct_outgoing_dependencies
   
@@ -205,8 +206,7 @@ plot_simulation <- function(tree, output, by_tier=TRUE) {
   incoming <- techs$all_incoming_dependencies/nrow(techs)
   outgoing <- techs$all_outgoing_dependencies/nrow(techs)
   
-  breaks <- seq(0,
-                1, by = 0.05)
+  breaks <- seq(0, 1, by = 0.05)
   
   h_in <- hist(incoming, breaks = breaks, plot = FALSE)
   h_out <- hist(outgoing, breaks = breaks, plot = FALSE)
