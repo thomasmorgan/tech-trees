@@ -211,11 +211,27 @@ plot_simulation <- function(tree, output, by_tier=TRUE) {
   h_in <- hist(incoming, breaks = breaks, plot = FALSE)
   h_out <- hist(outgoing, breaks = breaks, plot = FALSE)
   
+  # Choose axis labels using the original counts.
+  max_count <- max(h_in$counts, h_out$counts)
+  ticks <- pretty(c(0, sqrt(max_count)))
+  ticks <- ticks[ticks >= 0 & ticks <= sqrt(max_count)]
+  tick_labels <- round(ticks^2)
+  
+  # Transform the bar heights.
+  h_in$counts <- sqrt(h_in$counts)
+  h_out$counts <- sqrt(h_out$counts)
+  
   plot(h_in, col = adjustcolor("maroon", alpha.f = 0.5),
        main = "Proportion of tree indirectly depending", xlab = "Proportion",
-       ylim = c(0, max(h_in$counts, h_out$counts)))
+       ylab = "Frequency (square-root scale)",
+       freq = TRUE,
+       yaxt = "n",
+       ylim = c(0, sqrt(max_count)))
+  
   plot(h_out, col = adjustcolor("cornflowerblue", alpha.f = 0.5),
-       add = TRUE)
+       freq=TRUE, add = TRUE)
+  
+  axis(2, at = ticks, labels = tick_labels, las = 1)
   
   legend("topright", legend = c("Incoming", "Outgoing"),
          fill = adjustcolor(c("maroon", "cornflowerblue"), alpha.f = 0.5))
