@@ -41,9 +41,7 @@ create_techs <- function() {
 create_tech_tree <- function() {
   techs <- create_techs()
   dependencies <- create_dependency_matrix(techs)
-  if (check_dependencies(dependencies)) {
-    print("Tree is good.")
-  } else {
+  if (!check_dependencies(dependencies)) {
     print("Warning, tree contains loops!")
   }
   
